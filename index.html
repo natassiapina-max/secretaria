@@ -72,13 +72,12 @@
 </div>
 <footer>© Natassia Pina — Todos os direitos reservados</footer>
 <script>
-const CLAUDE_KEY = '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';
+// ✅ SEGURO: Todas as chaves ficam no Cloudflare Worker
+// Troque pela URL do seu worker após o deploy
+const WORKER_URL = 'https://sofia-proxy.natassiapina.workers.dev';
+
 const CALENDAR_ID = 'af2a3340baa6ce3e9e661b343e2cf04945c0ae1a8839eba4147ff733ac65e7ef@group.calendar.google.com';
 const PIX_PAYLOAD = '00020126330014br.gov.bcb.pix0111091525267805204000053039865406300.005802BR5913Natassia Pina6007Maringa62070503***63045FB8';
-
-// Google Service Account credentials
-const SA_EMAIL = 'sofia-agenda@sofia-secretaria-489321.iam.gserviceaccount.com';
-const SA_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqhEWpA+kXXh58\neac81Zbe4zYUZTKIE0RrZS1TfmjEfI9NhiptfxoDsAX1OsO45H9oYSINtUrIFoBh\nsWxjvhVNtUbNzpNBvgiN8Z40mL71OR585aBB7iA2NTKSLG5oipzXE7lhnObdkK3z\nIUGnQTG8e7o0tlhJ9xSMx/U9uxRIJP+EhLwb7g+Uqb9MSUEx9rMon9P4bjTw2Ky4\nAALJKpL6AlhciKRDUsCnCyfwtIYi/XDp1u0WUDRstQ+O5GmJnWc+zo94DRD0VNdB\n1T1sRBvQofnpYGo5NJaAgWwTDuVz9dEbLtRNt4+XUZURiZEGASd3FbtxhmYx1UWv\n9NHqXXOtAgMBAAECggEALigX4yRX2Cd2ASO9DU6TxEmkveiWwRbWEmwU1OEG4wkE\nkWub2H/rPsxLEJKToFzZ0Bta6HMGhxrwLYGlYWp2wc4sGFGussEJ98JLnNkr9506\nj3xo4O/gcEv+IGs+h7Xdtqp0J+Qc6iTbsVBzQR74o5iqUtJ5G6xyN5l43PjjCJPq\nBPLYWt0cQdrZwJsy/6nrWRiDIpVZVo2fac13cio8XkVmlUzFYHqldMUxnBfvN+2i\nCM04Icnii9J996WUrA1ZFQfnxHkEJq7wlMaKu/A7JzDH6O5xC+7cJwcGChGx7TdX\nKP3SZHuz+IfaOZCOeDqNYa/ULyjPP3x2/uD6kaU3UQKBgQDbyQpwuueM05xvU+Dd\n/JMjIAZsyLj9fVjHwpYCuW2/4o7b30OBpxOEGgl6sCJWdkA9R/YHVmM6cWFfaz1n\nnGwqWPdfS6u/rzGGXLewfUMCBQ9+wqd9DJfMcXdXgOM6vOeLyxBnnk+0mn19MhKf\nhegI9R3GxVCJMwvJjOl7CokLkwKBgQDGnPzYI9F57/5PZqTxvgFVOnk/iz/Aiz0U\ntB32I3RYmMg1+JMyARaSZI/8i2pAiCFwCGeb0kCcnpv9HEU4gjP+AOX0Iub+gAc3\nNmbOwmZNPARSuH7xwgADaGfsCK3U3knzV40HsepNVTRVuyy2JnCpRP74jgHSBhBy\nrgpz3veLvwKBgQC3f9Gcrx/1/xNkC5b6IA/Eys8ych+pXMcL+VV/rsuH4qM9xdk5\n3YG40HhLm9T/dTlLMNKj66drOxB+Ny4MXJgefysBwE8D+kSSFsUysFKK1CjMv75Q\n9HuksLNgNncBKojzuTXYHWAUvMu7BFxyHb3OBMC4nTMRabIUs/aXyQMEywKBgEy7\nylQXQo9B0ZcLqR5cslcjSETsn6zcHrUpAYpfGExCetefOf9PvFDC2X5QvrQ/4+tM\n0/q3uI7KGKopifTTGRNBdZZlBam9/Quv0PiA0tV0IpdzAFiXAzpN1Bi1IbPkTd3e\nLXaTnlpSWO3matfU8iHzri6JbtqdzS0BYLhzpGAxAoGAc4f9bWQDNOWRMGLu+AUC\nLn5FQX2G5xzLxdHQ++gHJ4QLlYobt4ab6qNeMD8DuTHPTjt72oMKsPbRcwyRXTZy\nT11yDyYeUuuU93z5uFRCnv8AiZmLdnjnP66HZyZPXCUqbfyx7BeWD/3pBULWZZ0Q\nc6RX54jjob+4hGhqhpdQTGs=\n-----END PRIVATE KEY-----\n`;
 
 const EMAILJS_PUBLIC_KEY = 'GSzpZvkLfj1UWarUh';
 const EMAILJS_SERVICE_ID = 'service_i3hd5gh';
@@ -87,27 +86,13 @@ const EMAILJS_TEMPLATE_ID = 'template_jwwbrf7';
 let history = [];
 let loading = false;
 let pendingBooking = null;
-let accessToken = null;
-let tokenExpiry = 0;
 
-// ===== JWT / Google Auth =====
+// ===== Google Auth via Worker (seguro — sem chaves no front-end) =====
 async function getAccessToken() {
-  if (accessToken && Date.now() < tokenExpiry) return accessToken;
-  const now = Math.floor(Date.now() / 1000);
-  const header = btoa(JSON.stringify({alg:'RS256',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-  const claim = btoa(JSON.stringify({iss:SA_EMAIL,scope:'https://www.googleapis.com/auth/calendar',aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-  const unsigned = header + '.' + claim;
-  const keyData = SA_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g,'');
-  const binaryKey = Uint8Array.from(atob(keyData), c => c.charCodeAt(0));
-  const cryptoKey = await crypto.subtle.importKey('pkcs8', binaryKey, {name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'}, false, ['sign']);
-  const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, new TextEncoder().encode(unsigned));
-  const sig = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-  const jwt = unsigned + '.' + sig;
-  const res = await fetch('https://oauth2.googleapis.com/token', {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`});
+  const res = await fetch(`${WORKER_URL}/api/google-token`);
   const data = await res.json();
-  accessToken = data.access_token;
-  tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
-  return accessToken;
+  if (!data.access_token) throw new Error('Falha ao obter token');
+  return data.access_token;
 }
 
 // ===== Google Calendar =====
@@ -307,9 +292,9 @@ REGRAS:
 5. Respostas curtas e humanas — máximo 3 parágrafos.`;
 
   history.push({role:'user',content:text});
-  const res = await fetch('https://api.anthropic.com/v1/messages',{
+  const res = await fetch(`${WORKER_URL}/api/chat`,{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:SYSTEM,messages:history})
   });
   const data = await res.json();
